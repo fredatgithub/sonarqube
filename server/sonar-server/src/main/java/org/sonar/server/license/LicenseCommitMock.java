@@ -17,24 +17,35 @@
  * along with this program; if not, write to the Free Software Foundation,
  * Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
  */
-package org.sonar.server.edition;
+package org.sonar.server.license;
 
-import org.junit.Test;
-import org.sonar.core.platform.ComponentContainer;
+import org.sonar.server.property.InternalProperties;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.sonar.core.platform.ComponentContainer.COMPONENTS_IN_EMPTY_COMPONENT_CONTAINER;
+import static java.util.Objects.requireNonNull;
 
-public class EditionManagementCommitModuleTest {
-  private EditionManagementCommitModule underTest = new EditionManagementCommitModule();
+public class LicenseCommitMock implements LicenseCommit {
+  private static final String LICENSE_PROPERTY_KEY = "sonarsource.license";
 
-  @Test
-  public void verify_component_count() {
-    ComponentContainer container = new ComponentContainer();
-    underTest.configure(container);
+  private final InternalProperties internalProperties;
 
-    assertThat(container.getPicoContainer().getComponentAdapters())
-      .hasSize(COMPONENTS_IN_EMPTY_COMPONENT_CONTAINER + 3);
+  public LicenseCommitMock(InternalProperties internalProperties) {
+    this.internalProperties = internalProperties;
   }
 
+  @Override
+  public void update(String newLicense) {
+    requireNonNull(newLicense, "newLicense can't be null");
+
+    if (newLicense.contains("failMe")) {
+      throw new IllegalArgumentException("Invalid license");
+    }
+
+    internalProperties.write(LICENSE_PROPERTY_KEY, newLicense);
+
+  }
+
+  @Override
+  public void delete() {
+    internalProperties.write(LICENSE_PROPERTY_KEY, null);
+  }
 }
