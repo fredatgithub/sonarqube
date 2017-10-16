@@ -203,7 +203,7 @@ BUILD)
   else
     echo 'Build feature branch or external pull request'
 
-    mvn install $MAVEN_ARGS -Dsource.skip=true
+    mvn install $MAVEN_ARGS -Dsource.skip=true -DskipTests=true
   fi
 
   ./run-integration-tests.sh "Lite" ""

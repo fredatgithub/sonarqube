@@ -96,7 +96,7 @@
     <skipSanityChecks>false</skipSanityChecks>
 
     <argLine>-Xmx512m -Djava.awt.headless=true</argLine>
-    <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
+    <maven.test.redirectTestOutputToFile>false</maven.test.redirectTestOutputToFile>
 
     <!-- used for deployment to SonarSource Artifactory -->
     <gitRepositoryName>sonarqube</gitRepositoryName>
