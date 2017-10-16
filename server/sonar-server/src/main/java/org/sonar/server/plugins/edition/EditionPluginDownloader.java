@@ -19,37 +19,30 @@
  */
 package org.sonar.server.plugins.edition;
 
-import com.google.common.base.Optional;
 import java.util.HashSet;
 import java.util.Set;
 import org.sonar.api.utils.HttpDownloader;
 import org.sonar.server.platform.ServerFileSystem;
 import org.sonar.server.plugins.AbstractPluginDownloader;
-import org.sonar.server.plugins.UpdateCenterMatrixFactory;
 import org.sonar.updatecenter.common.Release;
 import org.sonar.updatecenter.common.UpdateCenter;
 import org.sonar.updatecenter.common.Version;
 
 public class EditionPluginDownloader extends AbstractPluginDownloader {
-  private final UpdateCenterMatrixFactory updateCenterMatrixFactory;
 
-  public EditionPluginDownloader(UpdateCenterMatrixFactory updateCenterMatrixFactory, HttpDownloader downloader, ServerFileSystem fileSystem) {
+  public EditionPluginDownloader(HttpDownloader downloader, ServerFileSystem fileSystem) {
     super(fileSystem.getEditionDownloadedPluginsDir(), downloader);
-    this.updateCenterMatrixFactory = updateCenterMatrixFactory;
   }
 
-  public void installEdition(Set<String> pluginKeys) {
+  public void installEdition(Set<String> pluginKeys, UpdateCenter updateCenter) {
     try {
-      Optional<UpdateCenter> updateCenter = updateCenterMatrixFactory.getUpdateCenter(true);
-      if (updateCenter.isPresent()) {
-        Set<Release> pluginsToInstall = new HashSet<>();
-        for (String pluginKey : pluginKeys) {
-          pluginsToInstall.addAll(updateCenter.get().findInstallablePlugins(pluginKey, Version.create("")));
-        }
+      Set<Release> pluginsToInstall = new HashSet<>();
+      for (String pluginKey : pluginKeys) {
+        pluginsToInstall.addAll(updateCenter.findInstallablePlugins(pluginKey, Version.create("")));
+      }
 
-        for (Release r : pluginsToInstall) {
-          super.download(r);
-        }
+      for (Release r : pluginsToInstall) {
+        super.download(r);
       }
     } catch (Exception e) {
       cleanTempFiles();

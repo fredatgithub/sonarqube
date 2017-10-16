@@ -19,7 +19,6 @@
  */
 package org.sonar.server.plugins.edition;
 
-import com.google.common.base.Optional;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -29,17 +28,13 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.sonar.api.utils.HttpDownloader;
 import org.sonar.server.platform.ServerFileSystem;
-import org.sonar.server.plugins.UpdateCenterMatrixFactory;
 import org.sonar.updatecenter.common.Release;
 import org.sonar.updatecenter.common.UpdateCenter;
 import org.sonar.updatecenter.common.Version;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -47,25 +42,19 @@ import static org.mockito.Mockito.when;
 public class EditionPluginDownloaderTest {
   @Rule
   public TemporaryFolder temp = new TemporaryFolder();
-  @Mock
-  private UpdateCenterMatrixFactory updateCenterMatrixFactory;
-  @Mock
-  private UpdateCenter updateCenter;
-  @Mock
-  private ServerFileSystem fs;
-  @Mock
-  private HttpDownloader httpDownloader;
+
+  private ServerFileSystem fs = mock(ServerFileSystem.class);
+  private HttpDownloader httpDownloader = mock(HttpDownloader.class);
+  private UpdateCenter updateCenter = mock(UpdateCenter.class);
 
   private File downloadDir;
   private EditionPluginDownloader downloader;
 
   @Before
   public void setUp() throws IOException {
-    MockitoAnnotations.initMocks(this);
     downloadDir = temp.newFolder();
-    when(updateCenterMatrixFactory.getUpdateCenter(anyBoolean())).thenReturn(Optional.of(updateCenter));
     when(fs.getEditionDownloadedPluginsDir()).thenReturn(downloadDir);
-    downloader = new EditionPluginDownloader(updateCenterMatrixFactory, httpDownloader, fs);
+    downloader = new EditionPluginDownloader(httpDownloader, fs);
   }
 
   @Test
@@ -78,7 +67,8 @@ public class EditionPluginDownloaderTest {
     tmp.createNewFile();
 
     when(updateCenter.findInstallablePlugins("pluginKey", Version.create(""))).thenReturn(Collections.singletonList(release));
-    downloader.installEdition(Collections.singleton("pluginKey"));
+
+    downloader.installEdition(Collections.singleton("pluginKey"), updateCenter);
 
     verify(httpDownloader).download(new URI(url), tmp);
     assertThat(tmp).doesNotExist();
