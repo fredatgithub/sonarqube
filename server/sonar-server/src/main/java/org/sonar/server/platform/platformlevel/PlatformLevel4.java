@@ -455,7 +455,7 @@ public class PlatformLevel4 extends PlatformLevel {
       MacroInterpreter.class,
 
       // Notifications
-      NotificationModule.class,
+      NotificationModule.class, // ERIC
       NotificationWsModule.class,
       EmailsWsModule.class,
 
