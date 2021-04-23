@@ -23,7 +23,7 @@
     <sqZipDir>../sonar-application/target</sqZipDir>
     <category>*</category>
     <skipIts>false</skipIts>
-    <jetty.version>11.0.0</jetty.version>
+    <jetty.version>11.0.2</jetty.version>
     <byteman.version>3.0.10</byteman.version>
   </properties>
 
